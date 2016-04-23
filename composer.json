@@ -1,5 +1,5 @@
 {
-  "name": "lucascherifi/localhook-client",
+  "name": "localhook/localhook",
   "license": "MIT",
   "bin": [
     "localhook"
