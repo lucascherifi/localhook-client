@@ -6,7 +6,7 @@ A simple tool to receive http/https webhook notifications for development purpos
 
 This tool simplify web developments while using API using webhooks.
 
-1) Install the [server application](https://github.com/lucascherifi/localhook-server) at https://yourdomain.com
+1) Install the [server application](https://github.com/localhook/localhook-server) at https://yourdomain.com
 
 2) Configure a new webhook on the server
 
@@ -18,7 +18,7 @@ This tool simplify web developments while using API using webhooks.
 
 - Install:
 ```bash
-composer global require lucascherifi/localhook-client
+composer global require localhook/localhook
 ```
 - Start the client:
 ```bash

@@ -5,3 +5,4 @@
 .travis/phar-private.pem
 .travis/build-key.pem
 .travis/secrets.tar
+/.couscous
