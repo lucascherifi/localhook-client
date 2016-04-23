@@ -22,7 +22,7 @@
     "symfony/finder": "@stable",
     "symfony/process": "@stable",
     "symfony/yaml": "@stable",
-    "padraic/phar-updater": "@stable",
+    "padraic/phar-updater": "^1.0",
     "guzzlehttp/guzzle": "@stable",
     "symfony/filesystem": "@stable",
     "wisembly/elephant.io": "@stable"

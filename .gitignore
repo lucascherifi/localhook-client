@@ -1,2 +1,7 @@
 /vendor/
-localhook.phar
+.localhook.phar
+.localhook.phar.pubkey
+.localhook.phar.version
+.travis/phar-private.pem
+.travis/build-key.pem
+.travis/secrets.tar

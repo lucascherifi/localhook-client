@@ -15,13 +15,14 @@ if (file_exists($a = __DIR__ . '/../../autoload.php')) {
 }
 
 // import the Symfony Console Application
-use Kasifi\Localhook\Command\ConfigureCommand;
 use Kasifi\Localhook\Command\DeleteConfigurationCommand;
 use Kasifi\Localhook\Command\RunCommand;
+use Kasifi\Localhook\Command\SelfUpdateCommand;
 use Symfony\Component\Console\Application;
 
 $app = new Application();
 $app->add(new RunCommand());
+$app->add(new SelfUpdateCommand());
 $app->add(new DeleteConfigurationCommand());
 $app->run();
 ?>

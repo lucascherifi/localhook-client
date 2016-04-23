@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e97f26029d45db906553f4ba226287a1",
-    "content-hash": "4aaeaa48220016ba0e71b9426748a489",
+    "hash": "ad6406587fba0b9fd587adef8ae5a5dc",
+    "content-hash": "7b881b8b356fca5f4561ba6185051da6",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -828,7 +828,6 @@
         "symfony/finder": 0,
         "symfony/process": 0,
         "symfony/yaml": 0,
-        "padraic/phar-updater": 0,
         "guzzlehttp/guzzle": 0,
         "symfony/filesystem": 0,
         "wisembly/elephant.io": 0
