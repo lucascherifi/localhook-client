@@ -72,10 +72,15 @@ abstract class AbstractCommand extends Command
         if (!$endpoint) {
             if (
                 isset($this->configurationStorage->get()['webhooks'])
-                && count($webHooks = $this->configurationStorage->get()['webhooks'])
+                && $nbConfigs = count($webHooks = $this->configurationStorage->get()['webhooks'])
             ) {
-                $question = new ChoiceQuestion('Select a configured webhook', array_keys($webHooks));
-                $endpoint = $this->io->askQuestion($question);
+                if ($nbConfigs > 1) {
+                    $question = new ChoiceQuestion('Select a configured webhook', array_keys($webHooks));
+                    $endpoint = $this->io->askQuestion($question);
+                } else {
+                    $endpoint = array_keys($webHooks)[0];
+                }
+
             } else {
                 $endpoint = $this->addWebHookConfiguration();
             }
