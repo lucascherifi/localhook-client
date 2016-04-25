@@ -6,25 +6,31 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Kasifi\Localhook\Exceptions\DeletedChannelException;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 class RunCommand extends AbstractCommand
 
 {
+    /** @var integer */
+    private $timeout;
+
     protected function configure()
     {
         $this
             ->setName('run')
             ->addArgument('endpoint', InputArgument::OPTIONAL, 'The name of the endpoint.')
             ->addOption('max', null, InputOption::VALUE_OPTIONAL, 'The maximum number of notification before stop watcher', null)
-            ->setDescription('Run the localhook client');
+            ->setDescription('Watch for a notification and output it in JSON format.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->timeout = 15;
         parent::execute($input, $output);
         $this->ensureServerConnection();
         $endpoint = $input->getArgument('endpoint');
@@ -67,45 +73,74 @@ class RunCommand extends AbstractCommand
                 );
             }
 
-            $client = new Client();
-
             $url = $webHookConfiguration['localUrl'];
             if (count($notification['query'])) {
                 $url .= '?' . http_build_query($notification['query']);
             }
 
-            dump(array_merge($notification, ['url' => $url]));
-
-            try {
-                switch ($notification['method']) {
-                    case 'GET':
-                        $response = $client->get($url, [
-                            'headers' => $notification['headers'],
-                            'timeout' => 15,
-                        ]);
-                        break;
-                    case 'POST':
-                        $response = $client->post($url, [
-                            'timeout'     => 15,
-                            'headers'     => $notification['headers'],
-                            'form_params' => [
-                                $notification['request'],
-                            ],
-                        ]);
-                        break;
-                    default:
-                        throw new Exception(
-                            'Request method "' . $notification['method'] . '" not managed in this version.' .
-                            'Please request the feature in Github.'
-                        );
-                }
-                $output->writeln('RESPONSE: ' . $response->getStatusCode());
-            } catch (RequestException $e) {
-                if ($e->hasResponse()) {
-                    $output->writeln('RESPONSE: ' . $e->getResponse()->getStatusCode());
-                }
-            }
+            $this->displayNotification($notification, $url);
+            $this->sendNotification($notification, $url);
         }
         $this->socketIoClientConnector->closeConnection();
+    }
+
+    private function displayNotification($notification, $localUrl)
+    {
+        $vd = new VarDumper();
+
+        // Local Request
+        $this->io->section('Forwarding Notification');
+        $this->output->writeln($notification['method'] . ' ' . $localUrl);
+
+        // Headers
+        $headers = [];
+        foreach ($notification['headers'] as $key => $value) {
+            $headers[] = [$key, implode(';', $value)];
+        }
+        $this->output->writeln('Headers:');
+        (new Table($this->output))->setRows($headers)->render();
+
+        // POST arguments
+        if (count($notification['request'])) {
+            $this->output->writeln('POST arguments:');
+            $vd->dump($notification['request']);
+        } else {
+            $this->io->comment('No POST argument.');
+        }
+    }
+
+    private function sendNotification($notification, $url)
+    {
+        $client = new Client();
+        try {
+            $this->io->comment('Waiting for response (timeout=' . $this->timeout . ')..');
+            switch ($notification['method']) {
+                case 'GET':
+                    $response = $client->get($url, [
+                        'headers' => $notification['headers'],
+                        'timeout' => $this->timeout,
+                    ]);
+                    break;
+                case 'POST':
+                    $response = $client->post($url, [
+                        'timeout'     => $this->timeout,
+                        'headers'     => $notification['headers'],
+                        'form_params' => [
+                            $notification['request'],
+                        ],
+                    ]);
+                    break;
+                default:
+                    throw new Exception(
+                        'Request method "' . $notification['method'] . '" not managed in this version.' .
+                        'Please request the feature in Github.'
+                    );
+            }
+            $this->output->writeln('RESPONSE: ' . $response->getStatusCode());
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                $this->output->writeln('RESPONSE: ' . $e->getResponse()->getStatusCode());
+            }
+        }
     }
 }
