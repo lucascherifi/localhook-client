@@ -27,9 +27,6 @@ abstract class AbstractCommand extends Command
     /** @var ConfigurationStorage */
     protected $configurationStorage;
 
-    /** @var SocketIoClientConnector */
-    protected $socketIoClientConnector;
-
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->configurationStorage = new ConfigurationStorage();
@@ -47,27 +44,13 @@ abstract class AbstractCommand extends Command
 
             $this->io->comment($e->getMessage());
 
-            $serverUrl = $this->io->ask('Server URL', 'http://localhost:1337');
+            $serverUrl = $this->io->ask('Server URL', 'ws://127.0.0.1:1337');
 
             $this->configurationStorage->merge(['server_url' => $serverUrl])->save();
         }
     }
 
-    protected function ensureServerConnection()
-    {
-        if (!$this->socketIoClientConnector) {
-            $this->output->writeln('Connecting to ' . $this->configurationStorage->get()['server_url'] . ' ...');
-            $this->socketIoClientConnector = new SocketIoClientConnector($this->configurationStorage->get()['server_url']);
-            try {
-                $this->socketIoClientConnector->ensureConnection();
-            } catch (ServerConnectionFailureException $e) {
-                $this->io->error('The Localhook server at ' . $this->configurationStorage->get()['server_url'] . ' seems to be stopped.');
-                exit(1);
-            }
-        }
-    }
-
-    protected function retrieveWebHookConfiguration($endpoint)
+    protected function retrieveWebHookConfiguration($endpoint, $onSuccess)
     {
         if (!$endpoint) {
             if (
