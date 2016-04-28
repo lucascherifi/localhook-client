@@ -5,6 +5,7 @@ namespace Localhook\Localhook\Command;
 use Exception;
 use Localhook\Localhook\ConfigurationStorage;
 use Localhook\Localhook\Exceptions\NoConfigurationException;
+use Localhook\Localhook\Ratchet\UserClient;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,6 +25,12 @@ abstract class AbstractCommand extends Command
 
     /** @var ConfigurationStorage */
     protected $configurationStorage;
+
+    /** @var UserClient */
+    protected $socketUserClient;
+
+    /** @var string */
+    private $webHookPrivateKey;
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -48,7 +55,7 @@ abstract class AbstractCommand extends Command
         }
     }
 
-    protected function retrieveWebHookConfiguration($endpoint, $onSuccess)
+    protected function detectWebHookConfiguration($endpoint, callable $onSuccess)
     {
         if (!$endpoint) {
             if (
@@ -61,35 +68,48 @@ abstract class AbstractCommand extends Command
                 } else {
                     $endpoint = array_keys($webHooks)[0];
                 }
-
+                $webHookConfiguration = $this->getWebHookConfigurationBy('endpoint', $endpoint);
+                $onSuccess($webHookConfiguration);
             } else {
-                $endpoint = $this->addWebHookConfiguration();
+                $this->newWebHookConfiguration($onSuccess);
             }
         } elseif (!isset($endpoint, $this->configurationStorage->get()['webhooks'][$endpoint])) {
-            $endpoint = $this->addWebHookConfiguration();
+            $this->newWebHookConfiguration($onSuccess);
         }
-
-        return array_merge($this->configurationStorage->get()['webhooks'][$endpoint], ['endpoint' => $endpoint]);
     }
 
-    private function addWebHookConfiguration()
+    private function newWebHookConfiguration($onSuccess)
     {
-        $privateKey = $this->io->ask('Private key', '1----------------------------------');
-        $configuration = $this->socketIoClientConnector->retrieveConfigurationFromPrivateKey($privateKey);
-        $endpoint = $configuration['endpoint'];
-        if (!$endpoint) {
-            throw new Exception('This private key doesn\'t match any endpoint');
+        $this->webHookPrivateKey = $this->io->ask('Private key', '1----------------------------------');
+        $this->socketUserClient->executeRetrieveConfigurationFromSecret(
+            $this->webHookPrivateKey, function ($msg) use ($onSuccess) {
+            $endpoint = $msg['endpoint'];
+            if (!$endpoint) {
+                throw new Exception('This private key does not match any endpoint');
+            }
+            $this->io->comment('Associated endpoint: ' . $endpoint);
+
+            $url = $this->io->ask('Local URL to call when notification received', 'http://localhost/my-project/notifications');
+
+            $webHookConfiguration = [['privateKey' => $this->webHookPrivateKey, 'localUrl' => $url, 'endpoint' => $endpoint]];
+            $this->configurationStorage->merge([
+                'webhooks' => $webHookConfiguration,
+            ])->save();
+            $onSuccess($webHookConfiguration);
+        });
+    }
+
+    private function getWebHookConfigurationBy($key, $value)
+    {
+        $configuration = $this->configurationStorage->get();
+        if (!isset($configuration['webhooks'])) {
+            return null;
         }
-        $this->io->comment('Associated endpoint: ' . $endpoint);
-
-        $url = $this->io->ask('Local URL to call when notification received', 'http://localhost/my-project/notifications');
-
-        $this->configurationStorage->merge([
-            'webhooks' => [
-                $endpoint => ['privateKey' => $privateKey, 'localUrl' => $url],
-            ],
-        ])->save();
-
-        return $endpoint;
+        foreach ($configuration['webhooks'] as $webHook) {
+            if ($webHook[$key] == $value) {
+                return $webHook;
+            }
+        }
+        return null;
     }
 }

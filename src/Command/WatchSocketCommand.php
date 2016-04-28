@@ -58,7 +58,9 @@ class WatchSocketCommand extends ContainerAwareCommand
         }
         $this->secret = $webHook->getPrivateKey();
 
-        $this->socketUserClient = $this->getContainer()->get('socket_user_client');
+
+        $socketUrl = 'sdsd';
+        $this->socketUserClient = new UserClient($socketUrl);
         $this->io->comment('Connecting to ' . $this->socketUserClient->getUrl() . ' ...');
         $this->socketUserClient->start(function () {
             $this->socketUserClient->executeSubscribeWebHook(function ($msg) {
