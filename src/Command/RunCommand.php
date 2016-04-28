@@ -60,9 +60,7 @@ class RunCommand extends AbstractCommand
 
         parent::execute($input, $output);
 
-        $configuration = $this->configurationStorage->get();
-
-        $this->socketUserClient = new UserClient($configuration['server_url']);
+        $this->socketUserClient = new UserClient($this->serverUrl);
         $this->io->comment('Connecting to ' . $this->socketUserClient->getUrl() . ' ...');
 
         $this->socketUserClient->start(function () {

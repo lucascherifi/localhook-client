@@ -57,7 +57,7 @@ class ConfigurationStorage
     public function loadFromFile()
     {
         if ($this->dryRun) {
-            return [];
+            return $this;
         }
         if (!$this->fs->exists($this->baseConfigFilePath)) {
             throw new NoConfigurationException('No configuration file found at "' . $this->baseConfigFilePath . '" .');
