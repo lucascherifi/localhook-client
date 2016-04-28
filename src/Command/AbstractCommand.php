@@ -30,11 +30,20 @@ abstract class AbstractCommand extends Command
     protected $socketUserClient;
 
     /** @var string */
-    private $webHookPrivateKey;
+    protected $webHookPrivateKey;
+
+    /** @var string */
+    protected $webHookLocalUrl;
+
+    /** @var string */
+    protected $serverUrl;
+
+    /** @var boolean */
+    protected $noConfigFile;
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->configurationStorage = new ConfigurationStorage();
+        $this->configurationStorage = new ConfigurationStorage($this->noConfigFile);
         $this->io = new SymfonyStyle($input, $output);
         $this->input = new $input;
         $this->output = new $output;
@@ -49,9 +58,11 @@ abstract class AbstractCommand extends Command
 
             $this->io->comment($e->getMessage());
 
-            $serverUrl = $this->io->ask('Server URL', 'ws://127.0.0.1:1337');
+            if (!$this->serverUrl) {
+                $this->serverUrl = $this->io->ask('Server URL', 'ws://127.0.0.1:1337');
+            }
 
-            $this->configurationStorage->merge(['server_url' => $serverUrl])->save();
+            $this->configurationStorage->merge(['server_url' => $this->serverUrl])->save();
         }
     }
 
@@ -80,7 +91,9 @@ abstract class AbstractCommand extends Command
 
     private function newWebHookConfiguration($onSuccess)
     {
-        $this->webHookPrivateKey = $this->io->ask('Private key', '1----------------------------------');
+        if (!$this->webHookPrivateKey) {
+            $this->webHookPrivateKey = $this->io->ask('Private key', '1----------------------------------');
+        }
         $this->socketUserClient->executeRetrieveConfigurationFromSecret(
             $this->webHookPrivateKey, function ($msg) use ($onSuccess) {
             $endpoint = $msg['endpoint'];
@@ -88,12 +101,20 @@ abstract class AbstractCommand extends Command
                 throw new Exception('This private key does not match any endpoint');
             }
             $this->io->comment('Associated endpoint: ' . $endpoint);
+            if (!$this->webHookLocalUrl) {
+                $this->webHookLocalUrl = $this->io->ask(
+                    'Local URL to call when notification received',
+                    'http://localhost/my-project/notifications'
+                );
+            }
 
-            $url = $this->io->ask('Local URL to call when notification received', 'http://localhost/my-project/notifications');
-
-            $webHookConfiguration = [['privateKey' => $this->webHookPrivateKey, 'localUrl' => $url, 'endpoint' => $endpoint]];
+            $webHookConfiguration = [
+                'privateKey' => $this->webHookPrivateKey,
+                'localUrl'   => $this->webHookLocalUrl,
+                'endpoint'   => $endpoint,
+            ];
             $this->configurationStorage->merge([
-                'webhooks' => $webHookConfiguration,
+                'webhooks' => [$webHookConfiguration],
             ])->save();
             $onSuccess($webHookConfiguration);
         });
@@ -110,6 +131,7 @@ abstract class AbstractCommand extends Command
                 return $webHook;
             }
         }
+
         return null;
     }
 }

@@ -5,7 +5,6 @@ namespace Localhook\Localhook\Command;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Localhook\Localhook\Exceptions\DeletedChannelException;
 use Localhook\Localhook\Ratchet\UserClient;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -38,20 +37,28 @@ class RunCommand extends AbstractCommand
             $this->setName('run');
         }
         $this
-            ->addArgument('endpoint', InputArgument::OPTIONAL, 'The name of the endpoint.')
+            ->addArgument('endpoint', InputArgument::OPTIONAL, 'The name of the endpoint')
+            ->addArgument('private-key', InputArgument::OPTIONAL, 'The private key of the endpoint')
+            ->addArgument('local-url', InputArgument::OPTIONAL, 'The local URL to call when a request in received from the server')
+            ->addArgument('server-url', InputArgument::OPTIONAL, 'The server socket URL')
             ->addOption('max', null, InputOption::VALUE_OPTIONAL, 'The maximum number of notification before stop watcher', null)
-            ->setDescription('Watch for a notification and output it in JSON format.');
+            ->addOption('no-config-file', null, InputOption::VALUE_NONE, 'If you don\'t want to save the current configuration.', null)
+            ->setDescription('Watch for a notification and output it in JSON format');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-        parent::execute($input, $output);
         // Retrieve configuration (and store it if necessary)
         $this->max = $input->getOption('max');
         $this->counter = 0;
         $this->timeout = 15;
         $this->endpoint = $input->getArgument('endpoint');
+        $this->webHookPrivateKey = $input->getArgument('private-key');
+        $this->webHookLocalUrl = $input->getArgument('local-url');
+        $this->serverUrl = $input->getArgument('server-url');
+        $this->noConfigFile = $input->getOption('no-config-file');
+
+        parent::execute($input, $output);
 
         $configuration = $this->configurationStorage->get();
 
@@ -59,7 +66,6 @@ class RunCommand extends AbstractCommand
         $this->io->comment('Connecting to ' . $this->socketUserClient->getUrl() . ' ...');
 
         $this->socketUserClient->start(function () {
-
             $this->detectWebHookConfiguration($this->endpoint, function ($webHookConfiguration) {
                 $this->webHookConfiguration = $webHookConfiguration;
                 $this->socketUserClient->executeSubscribeWebHook(function ($msg) {
@@ -76,7 +82,7 @@ class RunCommand extends AbstractCommand
                     $this->socketUserClient->stop();
                     $this->io->warning('Max forward reached (' . $this->max . ')');
                     exit(0);
-                }, $this->webHookConfiguration['privateKey'], $this->max);
+                }, $this->webHookPrivateKey, $this->max);
             });
         });
 

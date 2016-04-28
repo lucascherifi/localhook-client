@@ -13,16 +13,20 @@ class ConfigurationStorage
 
     private $baseConfigFilePath;
 
+    /** @var bool */
+    private $dryRun;
+
     /** @var Filesystem */
     private $fs;
 
     /** @var array */
     private $configuration = [];
 
-    public function __construct()
+    public function __construct($dryRun = false)
     {
         $this->fs = new Filesystem();
         $this->initDirectoryPaths();
+        $this->dryRun = $dryRun;
     }
 
     private function initDirectoryPaths()
@@ -37,19 +41,24 @@ class ConfigurationStorage
 
     public function save()
     {
-        if (!$this->fs->exists($this->basePath)) {
-            $this->fs->mkdir($this->basePath);
+        if (!$this->dryRun) {
+            if (!$this->fs->exists($this->basePath)) {
+                $this->fs->mkdir($this->basePath);
+            }
+
+            $fileContent = json_encode($this->configuration, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+            $this->fs->dumpFile($this->baseConfigFilePath, $fileContent);
         }
-
-        $fileContent = json_encode($this->configuration, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        $this->fs->dumpFile($this->baseConfigFilePath, $fileContent);
 
         return $this;
     }
 
     public function loadFromFile()
     {
+        if ($this->dryRun) {
+            return [];
+        }
         if (!$this->fs->exists($this->baseConfigFilePath)) {
             throw new NoConfigurationException('No configuration file found at "' . $this->baseConfigFilePath . '" .');
         }
@@ -62,10 +71,12 @@ class ConfigurationStorage
 
     public function deleteFile()
     {
-        if (!$this->fs->exists($this->baseConfigFilePath)) {
-            throw new NoConfigurationException('No configuration file found at "' . $this->baseConfigFilePath . '" .');
+        if (!$this->dryRun) {
+            if (!$this->fs->exists($this->baseConfigFilePath)) {
+                throw new NoConfigurationException('No configuration file found at "' . $this->baseConfigFilePath . '" .');
+            }
+            $this->fs->remove($this->baseConfigFilePath);
         }
-        $this->fs->remove($this->baseConfigFilePath);
         $this->configuration = [];
 
         return $this;
