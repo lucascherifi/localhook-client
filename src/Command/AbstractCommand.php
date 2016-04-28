@@ -41,6 +41,9 @@ abstract class AbstractCommand extends Command
     /** @var boolean */
     protected $noConfigFile;
 
+    /** @var string */
+    protected $endpoint;
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->configurationStorage = new ConfigurationStorage($this->noConfigFile);
@@ -53,7 +56,7 @@ abstract class AbstractCommand extends Command
     protected function loadConfiguration()
     {
         try {
-            $this->configurationStorage->loadFromFile()->get();
+            $this->serverUrl = $this->configurationStorage->loadFromFile()->get()['server_url'];
         } catch (NoConfigurationException $e) {
 
             $this->io->comment($e->getMessage());
@@ -71,15 +74,18 @@ abstract class AbstractCommand extends Command
         if (!$endpoint) {
             if (
                 isset($this->configurationStorage->get()['webhooks'])
-                && $nbConfigs = count($webHooks = $this->configurationStorage->get()['webhooks'])
+                && $nbConfigs = count($this->configurationStorage->get()['webhooks'])
             ) {
+                $webHooks = $this->configurationStorage->get()['webhooks'];
                 if ($nbConfigs > 1) {
                     $question = new ChoiceQuestion('Select a configured webhook', array_keys($webHooks));
                     $endpoint = $this->io->askQuestion($question);
                 } else {
-                    $endpoint = array_keys($webHooks)[0];
+                    $endpoint = $webHooks[0]['endpoint'];
                 }
+                $this->endpoint = $endpoint;
                 $webHookConfiguration = $this->getWebHookConfigurationBy('endpoint', $endpoint);
+                $this->webHookPrivateKey = $webHookConfiguration['privateKey'];
                 $onSuccess($webHookConfiguration);
             } else {
                 $this->newWebHookConfiguration($onSuccess);
@@ -97,6 +103,7 @@ abstract class AbstractCommand extends Command
         $this->socketUserClient->executeRetrieveConfigurationFromSecret(
             $this->webHookPrivateKey, function ($msg) use ($onSuccess) {
             $endpoint = $msg['endpoint'];
+            $this->endpoint = $endpoint;
             if (!$endpoint) {
                 throw new Exception('This private key does not match any endpoint');
             }

@@ -19,9 +19,6 @@ class RunCommand extends AbstractCommand
     /** @var integer */
     private $timeout;
 
-    /** @var string */
-    private $endpoint;
-
     /** @var array */
     private $webHookConfiguration;
 
@@ -62,12 +59,11 @@ class RunCommand extends AbstractCommand
 
         $this->socketUserClient = new UserClient($this->serverUrl);
         $this->io->comment('Connecting to ' . $this->socketUserClient->getUrl() . ' ...');
-
         $this->socketUserClient->start(function () {
             $this->detectWebHookConfiguration($this->endpoint, function ($webHookConfiguration) {
                 $this->webHookConfiguration = $webHookConfiguration;
                 $this->socketUserClient->executeSubscribeWebHook(function ($msg) {
-                    $this->io->success('Successfully subscribed to ' . $msg['endpoint']);
+                    $this->io->success('Successfully subscribed to ' . $this->endpoint);
                     $this->output->writeln('Watch for notification to endpoint ' . $this->endpoint . ' ...');
                 }, function ($request) {
                     $url = $this->webHookConfiguration['localUrl'];
