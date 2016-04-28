@@ -18,12 +18,6 @@ php app/console doctrine:database:create
 php app/console doctrine:schema:update --force
 ```
 
-- Install socket IO dependencies:
-
-```bash
-cd src/AppBundle/Resources/SocketIo && npm install
-```
-
 Web server configuration
 ------------------------
 Nginx example :
@@ -39,8 +33,7 @@ Websockets server configuration
 -------------------------------
 
 ```bash
-cd src/AppBundle/Resources/SocketIo && npm install && cd -
-php app/console app:server:run-socket-io
+php app/console app:server:run-socket-server
 ```
 
 Verify

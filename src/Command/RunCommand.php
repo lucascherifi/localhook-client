@@ -1,11 +1,11 @@
 <?php
 
-namespace Kasifi\Localhook\Command;
+namespace Localhook\Localhook\Command;
 
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Kasifi\Localhook\Exceptions\DeletedChannelException;
+use Localhook\Localhook\Exceptions\DeletedChannelException;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +21,10 @@ class RunCommand extends AbstractCommand
 
     protected function configure()
     {
+        if (!$this->getName()) {
+            $this->setName('run');
+        }
         $this
-            ->setName('run')
             ->addArgument('endpoint', InputArgument::OPTIONAL, 'The name of the endpoint.')
             ->addOption('max', null, InputOption::VALUE_OPTIONAL, 'The maximum number of notification before stop watcher', null)
             ->setDescription('Watch for a notification and output it in JSON format.');
@@ -32,6 +34,7 @@ class RunCommand extends AbstractCommand
     {
         $this->timeout = 15;
         parent::execute($input, $output);
+
         $this->ensureServerConnection();
         $endpoint = $input->getArgument('endpoint');
         // Retrieve configuration (and store it if necessary)

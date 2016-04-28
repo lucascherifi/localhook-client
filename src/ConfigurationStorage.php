@@ -1,8 +1,8 @@
 <?php
 
-namespace Kasifi\Localhook;
+namespace Localhook\Localhook;
 
-use Kasifi\Localhook\Exceptions\NoConfigurationException;
+use Localhook\Localhook\Exceptions\NoConfigurationException;
 use Symfony\Component\Filesystem\Filesystem;
 
 class ConfigurationStorage

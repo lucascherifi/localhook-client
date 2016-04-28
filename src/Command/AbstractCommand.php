@@ -1,12 +1,10 @@
 <?php
 
-namespace Kasifi\Localhook\Command;
+namespace Localhook\Localhook\Command;
 
-use ElephantIO\Exception\ServerConnectionFailureException;
 use Exception;
-use Kasifi\Localhook\ConfigurationStorage;
-use Kasifi\Localhook\Exceptions\NoConfigurationException;
-use Kasifi\Localhook\SocketIoClientConnector;
+use Localhook\Localhook\ConfigurationStorage;
+use Localhook\Localhook\Exceptions\NoConfigurationException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

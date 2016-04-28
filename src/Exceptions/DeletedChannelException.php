@@ -1,6 +1,6 @@
 <?php
 
-namespace Kasifi\Localhook\Exceptions;
+namespace Localhook\Localhook\Exceptions;
 
 use Exception;
 

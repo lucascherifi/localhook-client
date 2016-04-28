@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5fe017e8a1625fe896aa6e1c5dd95888",
-    "content-hash": "db9cd633c6c4188e7f8ca6be34c79d9c",
+    "hash": "dd62b7615ad25eb5621e0ebee3215e32",
+    "content-hash": "fe6b47922e102fd9331dfff9be99b393",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -335,44 +335,6 @@
                 "response"
             ],
             "time": "2015-05-04 20:22:00"
-        },
-        {
-            "name": "psr/log",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/log.git",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe0936ee26643249e916849d48e3a51d5f5e278b",
-                "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for logging libraries",
-            "keywords": [
-                "log",
-                "psr",
-                "psr-3"
-            ],
-            "time": "2012-12-21 11:40:51"
         },
         {
             "name": "symfony/console",
@@ -751,72 +713,6 @@
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
             "time": "2016-03-04 07:55:57"
-        },
-        {
-            "name": "wisembly/elephant.io",
-            "version": "3.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Wisembly/elephant.io.git",
-                "reference": "8d8087551a0db14d258e7427eaeafad8bc6ea303"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Wisembly/elephant.io/zipball/8d8087551a0db14d258e7427eaeafad8bc6ea303",
-                "reference": "8d8087551a0db14d258e7427eaeafad8bc6ea303",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "psr/log": "~1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ElephantIO\\": [
-                        "src/",
-                        "test/"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Baptiste Clavié",
-                    "email": "baptiste@wisembly.com",
-                    "homepage": "http://baptiste.xn--clavi-fsa.net/",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Guillaume Potier",
-                    "email": "guillaume@wisembly.com",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Ludovic Barreca",
-                    "email": "ludogp2@gmail.com",
-                    "role": "Project Founder"
-                },
-                {
-                    "name": "Elephant.IO Community",
-                    "role": "Contributors :)"
-                }
-            ],
-            "description": "Send events to a websocket real time engine though PHP",
-            "homepage": "http://elephant.io",
-            "keywords": [
-                "dialog",
-                "nodejs",
-                "real time",
-                "websocket"
-            ],
-            "time": "2016-02-05 00:32:18"
         }
     ],
     "packages-dev": [],
@@ -829,8 +725,7 @@
         "symfony/process": 0,
         "symfony/yaml": 0,
         "guzzlehttp/guzzle": 0,
-        "symfony/filesystem": 0,
-        "wisembly/elephant.io": 0
+        "symfony/filesystem": 0
     },
     "prefer-stable": false,
     "prefer-lowest": false,

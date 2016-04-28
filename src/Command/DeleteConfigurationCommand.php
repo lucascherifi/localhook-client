@@ -1,6 +1,6 @@
 <?php
 
-namespace Kasifi\Localhook\Command;
+namespace Localhook\Localhook\Command;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;

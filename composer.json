@@ -12,7 +12,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Kasifi\\Localhook\\": "src"
+      "Localhook\\Localhook\\": "src"
     }
   },
   "minimum-stability": "stable",
@@ -24,7 +24,6 @@
     "symfony/yaml": "@stable",
     "padraic/phar-updater": "^1.0",
     "guzzlehttp/guzzle": "@stable",
-    "symfony/filesystem": "@stable",
-    "wisembly/elephant.io": "@stable"
+    "symfony/filesystem": "@stable"
   }
 }
