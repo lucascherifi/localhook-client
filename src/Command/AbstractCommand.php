@@ -56,7 +56,10 @@ abstract class AbstractCommand extends Command
     protected function loadConfiguration()
     {
         try {
-            $this->serverUrl = $this->configurationStorage->loadFromFile()->get()['server_url'];
+            $configuration = $this->configurationStorage->loadFromFile()->get();
+            if (!$this->serverUrl && isset($configuration['server_url'])) {
+                $this->serverUrl = $configuration['server_url'];
+            }
         } catch (NoConfigurationException $e) {
 
             $this->io->comment($e->getMessage());
