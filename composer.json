@@ -3,7 +3,7 @@
   "description": "The Localhook client",
   "license": "MIT",
   "bin": [
-    "localhook"
+    "bin/localhook"
   ],
   "authors": [
     {

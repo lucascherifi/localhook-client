@@ -15,6 +15,7 @@ if (file_exists($a = __DIR__ . '/../../autoload.php')) {
 }
 
 // import the Symfony Console Application
+use Localhook\Localhook\Command\AutoConfigureCommand;
 use Localhook\Localhook\Command\DeleteConfigurationCommand;
 use Localhook\Localhook\Command\RunCommand;
 use Localhook\Localhook\Command\SelfUpdateCommand;
@@ -22,7 +23,8 @@ use Symfony\Component\Console\Application;
 
 $app = new Application();
 $app->add(new RunCommand());
-$app->add(new SelfUpdateCommand());
+$app->add(new AutoConfigureCommand());
 $app->add(new DeleteConfigurationCommand());
+$app->add(new SelfUpdateCommand());
 $app->run();
-?>
+

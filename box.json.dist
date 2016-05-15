@@ -16,7 +16,7 @@
   ],
   "git-version": "package_version",
   "intercept": true,
-  "main": "localhook",
+  "main": "bin/localhook",
   "output": "localhook.phar",
   "stub": true
 }
